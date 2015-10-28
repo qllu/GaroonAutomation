@@ -18,14 +18,14 @@ sys.path.append(os.getcwd()+"src/")
 from TestCases import QT_Space_create_public_space
 from TestCases import QT_Space_create_private_space
 from TestCases import QT_Space_create_space_category
-from TestCases import QT_Space_delete_space
+from TestCases import QT_Space_create_discussion
 
 # 测试用例集合
 testnames = [
     QT_Space_create_space_category.CreateSpaceCategory,
     QT_Space_create_public_space.CreatePublicSpace,
     QT_Space_create_private_space.CreatePrivateSpace,
-    QT_Space_delete_space.DeleteSpace
+    QT_Space_create_discussion.CreateDiscussion
 ]
 
 
