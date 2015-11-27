@@ -10,6 +10,7 @@ import time
 import unittest
 import sys
 import os
+from selenium.common.exceptions import NoSuchElementException
 
 sys.path.append("..")
 sys.path.append(os.getcwd() + "/src/")
@@ -25,7 +26,7 @@ class CreatePrivateSpace(unittest.TestCase):
 
     @classmethod
     def setUpClass(self):
-        WebDriver("open", "firefox", "local").setup("fcn")  # 打开浏览器，并打开forest
+        WebDriver("open", "firefox", "local").open("qatest01")  # 打开浏览器，并打开forest
 
     def test1_create_private_space(self):
         global dataoper, detail_url, current_url
@@ -39,36 +40,36 @@ class CreatePrivateSpace(unittest.TestCase):
         WebDriver().geturl(garoon_url)
         time.sleep(1)
         # 点击进入space
-        WebDriver().clickitem('bycss', dataoper.readxml('space', 0, 'space_icon'))
+        WebDriver().click('bycss', dataoper.readxml('space', 0, 'space_icon'))
         time.sleep(2)
         # 创建space
-        WebDriver().clickitem('bylink', dataoper.readxml('space', 0, 'creat_link'))
+        WebDriver().click('bylink', dataoper.readxml('space', 0, 'creat_link'))
         time.sleep(1)
         # 输入title
-        WebDriver().inputvalue('byid', dataoper.readxml('space', 0, 'space_title'),
+        WebDriver().input('byid', dataoper.readxml('space', 0, 'space_title'),
                                    dataoper.readxml('space', 0, 'title'))
         time.sleep(1)
         # 搜索添加用户
-        WebDriver().inputvalue('byname', dataoper.readxml('space', 0, 'e_keyword'),
+        WebDriver().input('byname', dataoper.readxml('space', 0, 'e_keyword'),
                                    dataoper.readxml('space', 0, 'keyword'))
         time.sleep(1)
-        WebDriver().clickitem('byxpath', dataoper.readxml('space', 0, 'search'))
+        WebDriver().click('byxpath', dataoper.readxml('space', 0, 'search'))
         time.sleep(1)
-        WebDriver().clickitem('byid', dataoper.readxml('space', 0, 'add_user'))
+        WebDriver().click('byid', dataoper.readxml('space', 0, 'add_user'))
         time.sleep(1)
         # 选择公开方式
-        WebDriver().clickitem('byid', dataoper.readxml('space', 0, 'private'))
+        WebDriver().click('byid', dataoper.readxml('space', 0, 'private'))
 
         # 保存
-        WebDriver().clickitem('byid', dataoper.readxml('space', 0, 'save'))
+        WebDriver().click('byid', dataoper.readxml('space', 0, 'save'))
         time.sleep(1)
         current_url = WebDriver().currenturl()
         # print "current_url:", current_url
 
         # 进入详细页面,并获取url
-        WebDriver().clickitem('byid', dataoper.readxml('space', 0, 'droplist'))
+        WebDriver().click('byid', dataoper.readxml('space', 0, 'droplist'))
         time.sleep(1)
-        WebDriver().clickitem('bylink', dataoper.readxml('space', 0, 'detail'))
+        WebDriver().click('bylink', dataoper.readxml('space', 0, 'detail'))
         time.sleep(1)
         detail_url = WebDriver().currenturl()
 
@@ -90,7 +91,7 @@ class CreatePrivateSpace(unittest.TestCase):
         # 确认是否能正常访问
         try:
             WebDriver().is_element_present('byclass', dataoper.readxml('confirm', 1, 'element'))
-        except Exception as msg:
+        except NoSuchElementException as msg:
             print msg
         else:
             print "space成员确认可以访问"
@@ -106,7 +107,7 @@ class CreatePrivateSpace(unittest.TestCase):
         # 确认是否显示错误页面
         try:
             WebDriver().is_element_present('byclass', dataoper.readxml('confirm', 0, 'element'))
-        except Exception as msg:
+        except NoSuchElementException as msg:
             print msg
         else:
             print "space以外的成员不能访问"
@@ -124,16 +125,16 @@ class CreatePrivateSpace(unittest.TestCase):
             time.sleep(2)
             WebDriver().geturl(detail_url)
             time.sleep(2)
-            WebDriver().clickitem('byid', dataoper.readxml('space', 0, 'delete_link'))
+            WebDriver().click('byid', dataoper.readxml('space', 0, 'delete_link'))
             time.sleep(2)
-            WebDriver().clickitem('byxpath', dataoper.readxml('space', 0, 'delete_yes'))
+            WebDriver().click('byxpath', dataoper.readxml('space', 0, 'delete_yes'))
             time.sleep(2)
-        except Exception as msg:
+        except NoSuchElementException as msg:
             print msg
         else:
             print "space数据已清除"
         finally:
-            WebDriver().teardown()  # 关闭浏览器
+            WebDriver().close()  # 关闭浏览器
 
 
 if __name__ == "__main__":

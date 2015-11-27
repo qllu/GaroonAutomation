@@ -9,6 +9,7 @@ WebDriverHelp用来存放所有页面操作用到公用方法
 from selenium import webdriver
 from selenium.webdriver.support.ui import Select
 from selenium.common.exceptions import NoSuchElementException
+from selenium.webdriver.common.action_chains import ActionChains
 # from selenium.webdriver.common.action_chains import ActionChains
 # from selenium.webdriver.common.keys import Keys
 global G_WEBDRIVER, G_BROWSERTYTPE,driver
@@ -26,19 +27,19 @@ class WebDriver(object):
         @param cType:打开本地或是远程浏览器： local,本地；notlocal：远程
         """
         global driver
-        if(  btype == "open" ):           
+        if(  btype == "open" ):
             if(  atype == "chrome" ):
-                if(ctype == "local"):   
+                if(ctype == "local"):
                     driver = webdriver.Chrome()
                     # driver.maximize_window()
-                elif(ctype == "notlocal"): 
+                elif(ctype == "notlocal"):
                     print "打开远程的chrome"
                     driver = webdriver.Remote(command_executor='http://10.60.1.186:4444/wd/hub',
                                               desired_capabilities=webdriver.DesiredCapabilities.CHROME)
                     # driver.maximize_window()
 
             elif(  atype == "ie" ):
-                if(ctype == "local"): 
+                if(ctype == "local"):
                     driver = webdriver.Ie()
                     # driver.maximize_window()
                 elif(ctype == "notlocal"):
@@ -59,19 +60,19 @@ class WebDriver(object):
                                   
         self.driver = driver
  
-    def  setup(self,logintype):
+    def open(self,logintype):
         """
         定制测试URL，可分为单机版、云版
         @param logintype: 指定测试的URL： onpre:单机版测试地址，cloud:云版测试地址
         """
         try:
-            fdev_url = "http://jljin.cybozu-dev.com"
-            fcn_url = "https://qatest01.cybozu.cn"
+            jljin_url = "http://jljin.cybozu-dev.com"
+            qatest01_url = "https://qatest01.cybozu.cn"
 
-            if(logintype == "fdev"):
-                self.driver.get(fdev_url)
-            elif(logintype == "fcn"):
-                self.driver.get(fcn_url)
+            if(logintype == "jljin"):
+                self.driver.get(jljin_url)
+            elif(logintype == "qatest01"):
+                self.driver.get(qatest01_url)
             else:
                 print '路径错误！'
             self.driver.implicitly_wait(1)
@@ -88,7 +89,7 @@ class WebDriver(object):
         else:
             print "url错误"
               
-    def  teardown(self):
+    def  close(self):
         '''
         关闭浏览器
         '''       
@@ -127,18 +128,46 @@ class WebDriver(object):
             self.driver.find_element_by_css_selector(elmethod).is_displayed()
 
 
-    """
-    def switch(self,type):
+    def screenshot(self,file_path):
+        self.driver.get_screenshot_as_file(file_path)
+
+    def drag_and_drop(self, el_css, target_css):
+        '''
+        Drags an element a certain distance and then drops it.
+
+        Usage:
+        driver.drag_and_drop("#el","#ta")
+        '''
+        element = self.driver.find_element_by_css_selector(el_css)
+        target = self.driver.find_element_by_css_selector(target_css)
+        ActionChains(driver).drag_and_drop(element, target).perform()
+
+
+    def switch_to_frame(self,elmethod):
 
         #切换到新页面
+        xf = self.driver.find_element_by_css_selector(elmethod)
+        self.driver._switch_to.frame(xf)
 
-        if(type == 'win'):
-            self.driver.switch_to_window(self.driver.window_handles[-1])
-        if type == 'iframe':
-            self.driver.switch_to_frame(frame)
-    """
+    def switch_to_frame_out(self):
+        self.driver._switch_to.default_content()
 
-    def clickitem(self,findby,elmethod):
+    def open_new_window(self, elmethod):
+        '''
+        Open the new window and switch the handle to the newly opened window.
+        Usage:
+        driver.open_new_window()
+        '''
+        driver = self.driver
+        original_windows = driver.current_window_handle
+        driver.find_element_by_css_selector(elmethod).click()
+        all_handles = driver.window_handles
+        for handle in all_handles:
+            if handle != original_windows:
+                driver._switch_to.window(handle)
+
+
+    def click(self,findby,elmethod):
         '''
         通过定制定位方法，在对应的项目上执行单击操作
         @param findby: 定位方法，如：byid,byname,byclassname,byxpath等
@@ -157,7 +186,7 @@ class WebDriver(object):
         elif(findby == 'bycss'):
             self.driver.find_element_by_css_selector(elmethod).click()         
             
-    def clearvalue(self,findby,elmethod):
+    def clear(self,findby,elmethod):
         '''
         通过定制定位方法，在输入框中输入值
         @param findby: 定位方法，如：byid,byname,byclassname,byxpath等
@@ -173,7 +202,7 @@ class WebDriver(object):
         elif(findby == 'byxpath'):
             self.driver.find_element_by_xpath(elmethod).clear()          
       
-    def inputvalue(self,findby,elmethod,value):
+    def input(self,findby,elmethod,value):
         '''
         通过定制定位方法，在输入框中输入值
         @param findby: 定位方法，如：byid,byname,byclassname,byxpath等
@@ -189,7 +218,7 @@ class WebDriver(object):
         elif(findby == 'byxpath'):
             self.driver.find_element_by_xpath(elmethod).send_keys(value)
 
-    def  selectvalue(self,findby,select,selectvalue):
+    def  select(self,findby,select,selectvalue):
         '''
         通过定制定位方法和要选择项的文本，选择指定的项目
         @param findby:定位方法，如：byid,byname,byclassname等
@@ -202,7 +231,21 @@ class WebDriver(object):
             select = Select(self.driver.find_element_by_name(select))
         elif(findby =='byclass'):
             select = Select(self.driver.find_element_by_classname(select))                 
-        select.select_by_visible_text(selectvalue)                      
+        select.select_by_visible_text(selectvalue)
+
+    def is_selected(self,findby,elmethod):
+        if(findby == 'byid'):
+            return self.driver.find_element_by_id(elmethod).is_selected()
+        elif(findby == 'byname'):
+            return self.driver.find_element_by_name(elmethod).is_selected()
+        elif(findby == 'byxpath'):
+            return self.driver.find_element_by_xpath(elmethod).is_selected()
+        elif(findby=='byclass'):
+            return self.driver.find_element_by_class_name(elmethod).is_selected()
+        elif(findby=='bycss'):
+            return self.driver.find_element_by_css_selector(elmethod).is_selected()
+        elif(findby== 'bylink'):
+            return self.driver.find_element_by_link_text(elmethod).is_selected()
 
     def gettext(self,findby,elmethod):
         '''

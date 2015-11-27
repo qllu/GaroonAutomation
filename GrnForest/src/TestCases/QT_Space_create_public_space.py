@@ -6,13 +6,17 @@ Created on 2015年10月14日
 @author: QLLU
 '''
 # 导入需要的公共函数类
-import time, unittest, sys, os
+import time
+import unittest
+import sys
+import os
 
 sys.path.append("..")
 sys.path.append(os.getcwd() + "/src/")
 from CommonFunction.DataReader import DataReader
 from CommonFunction.Operations import Operations
 from CommonFunction.WebDriver import WebDriver
+from selenium.common.exceptions import NoSuchElementException
 
 
 class CreatePublicSpace(unittest.TestCase):
@@ -21,7 +25,7 @@ class CreatePublicSpace(unittest.TestCase):
     '''
     @classmethod
     def setUpClass(self):
-        WebDriver("open", "firefox", "local").setup("fcn")  # 打开浏览器，并打开forest
+        WebDriver("open", "firefox", "local").open("qatest01")  # 打开浏览器，并打开forest
 
     def test1_create_public_space(self):
         global dataoper, detail_url, current_url
@@ -35,34 +39,34 @@ class CreatePublicSpace(unittest.TestCase):
         WebDriver().geturl(garoon_url)
         time.sleep(1)
         # 点击进入space
-        WebDriver().clickitem('bycss', dataoper.readxml('space', 0, 'space_icon'))
+        WebDriver().click('bycss', dataoper.readxml('space', 0, 'space_icon'))
         time.sleep(2)
         # 创建space
-        WebDriver().clickitem('bylink', dataoper.readxml('space', 0, 'creat_link'))
+        WebDriver().click('bylink', dataoper.readxml('space', 0, 'creat_link'))
         time.sleep(1)
         # 输入title
-        WebDriver().inputvalue('byid', dataoper.readxml('space', 0, 'space_title'),
-                                   dataoper.readxml('space', 0, 'title'))
+        WebDriver().input('byid', dataoper.readxml('space', 0, 'space_title'),
+                                dataoper.readxml('space', 0, 'title'))
         time.sleep(1)
         # 搜索添加用户
-        WebDriver().inputvalue('byname', dataoper.readxml('space', 0, 'e_keyword'),
-                                   dataoper.readxml('space', 0, 'keyword'))
+        WebDriver().input('byname', dataoper.readxml('space', 0, 'e_keyword'),
+                                dataoper.readxml('space', 0, 'keyword'))
         time.sleep(1)
-        WebDriver().clickitem('byxpath', dataoper.readxml('space', 0, 'search'))
+        WebDriver().click('byxpath', dataoper.readxml('space', 0, 'search'))
         time.sleep(1)
-        WebDriver().clickitem('byid', dataoper.readxml('space', 0, 'add_user'))
+        WebDriver().click('byid', dataoper.readxml('space', 0, 'add_user'))
         time.sleep(1)
         # 选择公开方式
-        WebDriver().clickitem('byid', dataoper.readxml('space', 0, 'public'))
+        WebDriver().click('byid', dataoper.readxml('space', 0, 'public'))
         # 保存
-        WebDriver().clickitem('byid', dataoper.readxml('space', 0, 'save'))
+        WebDriver().click('byid', dataoper.readxml('space', 0, 'save'))
         time.sleep(1)
         current_url = WebDriver().currenturl()
         # print "current_url:", current_url
         # 进入详细页面
-        WebDriver().clickitem('byid', dataoper.readxml('space', 0, 'droplist'))
+        WebDriver().click('byid', dataoper.readxml('space', 0, 'droplist'))
         time.sleep(1)
-        WebDriver().clickitem('bylink', dataoper.readxml('space', 0, 'detail'))
+        WebDriver().click('bylink', dataoper.readxml('space', 0, 'detail'))
         time.sleep(1)
         detail_url = WebDriver().currenturl()
         # 验证：1.确认space名称；2.确认公开方式
@@ -84,10 +88,12 @@ class CreatePublicSpace(unittest.TestCase):
         # 确认是否存在元素
         try:
             WebDriver().is_element_present('byclass', dataoper.readxml('confirm', 1, 'element'))
-        except Exception as msg:
+        except NoSuchElementException as msg:
             print msg
+            WebDriver().screenshot("../ScreenShot/error1.png")
         else:
             print "space成员可以访问space"
+
 
     def test3_other_confirm(self):
         # 使用其他用户确认
@@ -99,8 +105,9 @@ class CreatePublicSpace(unittest.TestCase):
         # 确认是否存在元素
         try:
             WebDriver().is_element_present('byclass', dataoper.readxml('confirm', 0, 'element'))
-        except Exception as msg:
+        except NoSuchElementException as msg:
             print msg
+            WebDriver().screenshot("../ScreenShot/error2.png")
         else:
             print "其他用户确认可以访问公开space"
 
@@ -109,10 +116,10 @@ class CreatePublicSpace(unittest.TestCase):
         time.sleep(2)
         WebDriver().geturl(detail_url)
         time.sleep(2)
-        WebDriver().clickitem('byid', dataoper.readxml('space', 0, 'delete_link'))
+        WebDriver().click('byid', dataoper.readxml('space', 0, 'delete_link'))
         time.sleep(2)
         try:
-            WebDriver().clickitem('byxpath', dataoper.readxml('space', 0, 'delete_yes'))
+            WebDriver().click('byxpath', dataoper.readxml('space', 0, 'delete_yes'))
             time.sleep(2)
         except Exception as msg:
             print msg
@@ -126,7 +133,7 @@ class CreatePublicSpace(unittest.TestCase):
     @classmethod
     def tearDownClass(self):
         # 关闭浏览器
-        WebDriver().teardown()
+        WebDriver().close()
 
 
 if __name__ == "__main__":
