@@ -65,7 +65,9 @@ class AddFacilityGroup(unittest.TestCase):
 
     @classmethod
     def setUpClass(self):
-        WebDriver("open", "firefox", "local").open("qatest01")  # 打开浏览器，并打开forest
+        global domain
+        domain = "qatest01"
+        WebDriver("open", "firefox", "local").open(domain, "slash")  # 打开浏览器，并打开forest
 
     def test1_add_facility_group(self):
         global group_url, group_detail_url

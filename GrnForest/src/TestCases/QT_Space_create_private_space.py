@@ -26,7 +26,9 @@ class CreatePrivateSpace(unittest.TestCase):
 
     @classmethod
     def setUpClass(self):
-        WebDriver("open", "firefox", "local").open("qatest01")  # 打开浏览器，并打开forest
+        global domain
+        domain = "qatest01"
+        WebDriver("open", "firefox", "local").open(domain, "slash")  # 打开浏览器，并打开forest
 
     def test1_create_private_space(self):
         global dataoper, detail_url, current_url
@@ -36,8 +38,7 @@ class CreatePrivateSpace(unittest.TestCase):
                            dataoper.readxml('login', 0, 'password'))
         time.sleep(2)
         # 点击进入Garoon
-        garoon_url = WebDriver().testurl("qatest01") + "/g/"
-        WebDriver().geturl(garoon_url)
+        WebDriver().open(domain, "g")
         time.sleep(1)
         # 点击进入space
         WebDriver().click('bycss', dataoper.readxml('space', 0, 'space_icon'))
@@ -96,7 +97,7 @@ class CreatePrivateSpace(unittest.TestCase):
         else:
             print "space成员确认可以访问"
 
-    def test3_other_confirm(self):
+    def test3_other_user_confirm(self):
         # 使用其他用户确认
         Operations().login(dataoper.readxml('confirm', 0, 'username'),
                               dataoper.readxml('confirm', 0, 'password'))

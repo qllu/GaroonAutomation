@@ -21,7 +21,9 @@ class CreateDiscussion(unittest.TestCase):
     '''
     @classmethod
     def setUpClass(self):
-        WebDriver("open", "firefox", "local").open("qatest01")  # 打开浏览器，并打开forest
+        global domain
+        domain = "qatest01"
+        WebDriver("open", "firefox", "local").open(domain, "slash")  # 打开浏览器，并打开forest
 
     def test1_create_discussion(self):
         # 新建space
@@ -32,8 +34,7 @@ class CreateDiscussion(unittest.TestCase):
                               dataoper.readxml('login', 0, 'password'))
         time.sleep(2)
         # 点击进入Garoon
-        garoon_url = WebDriver().testurl("qatest01") + "/g/"
-        WebDriver().geturl(garoon_url)
+        WebDriver().open(domain, "g")
         time.sleep(1)
         # 点击进入space
         WebDriver().click('bycss', dataoper.readxml('space', 0, 'space_icon'))
@@ -69,7 +70,13 @@ class CreateDiscussion(unittest.TestCase):
         # 获取discussion的URL
         disc_url = WebDriver().currenturl()
 
+    def test2_add_comment(self):
         # 提交带附件的回复
+        dataoper = DataReader('QT_Space_create_discussion.xml')
+        Operations().login(dataoper.readxml('login', 0, 'username'),
+                              dataoper.readxml('login', 0, 'password'))
+        WebDriver().geturl(disc_url)
+        time.sleep(2)
         upfile2 = os.path.abspath('../Attachement/test.txt')
         WebDriver().input('byid', dataoper.readxml('disc', 0, 'comment_input'),
                                    dataoper.readxml('disc', 0, 'comment'))
@@ -80,7 +87,7 @@ class CreateDiscussion(unittest.TestCase):
         time.sleep(2)
 
 
-    def test2_other_confirm(self):
+    def test3_other_user_confirm(self):
         Operations().login(dataoper.readxml('confirm', 0, 'username'),
                               dataoper.readxml('confirm', 0, 'password'))
         time.sleep(2)
@@ -94,7 +101,7 @@ class CreateDiscussion(unittest.TestCase):
         WebDriver().click('byid', dataoper.readxml('confirm', 0, 'comment_submit'))
         time.sleep(2)
 
-    def test3_delete_discssion(self):
+    def test4_delete_discssion(self):
         Operations().login(dataoper.readxml('login', 0, 'username'),
                               dataoper.readxml('login', 0, 'password'))
         time.sleep(2)

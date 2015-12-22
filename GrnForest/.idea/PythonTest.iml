@@ -6,5 +6,7 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="module" module-name="PythonTraining" />
+    <orderEntry type="module" module-name="AppiumPython" />
   </component>
 </module>
