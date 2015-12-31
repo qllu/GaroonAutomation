@@ -26,9 +26,10 @@ class CreatePrivateSpace(unittest.TestCase):
 
     @classmethod
     def setUpClass(self):
-        global domain
+        global domain, driver
         domain = "qatest01"
-        WebDriver("open", "firefox", "local").open(domain, "slash")  # 打开浏览器，并打开forest
+        driver = WebDriver("open", "firefox", "local")
+        driver.open(domain, "slash")  # 打开浏览器，并打开forest
 
     def test1_create_private_space(self):
         global dataoper, detail_url, current_url
@@ -38,45 +39,45 @@ class CreatePrivateSpace(unittest.TestCase):
                            dataoper.readxml('login', 0, 'password'))
         time.sleep(2)
         # 点击进入Garoon
-        WebDriver().open(domain, "g")
+        driver.open(domain, "g")
         time.sleep(1)
         # 点击进入space
-        WebDriver().click('bycss', dataoper.readxml('space', 0, 'space_icon'))
+        driver.click('bycss', dataoper.readxml('space', 0, 'space_icon'))
         time.sleep(2)
         # 创建space
-        WebDriver().click('bylink', dataoper.readxml('space', 0, 'creat_link'))
+        driver.click('bylink', dataoper.readxml('space', 0, 'creat_link'))
         time.sleep(1)
         # 输入title
-        WebDriver().input('byid', dataoper.readxml('space', 0, 'space_title'),
+        driver.input('byid', dataoper.readxml('space', 0, 'space_title'),
                                    dataoper.readxml('space', 0, 'title'))
         time.sleep(1)
         # 搜索添加用户
-        WebDriver().input('byname', dataoper.readxml('space', 0, 'e_keyword'),
+        driver.input('byname', dataoper.readxml('space', 0, 'e_keyword'),
                                    dataoper.readxml('space', 0, 'keyword'))
         time.sleep(1)
-        WebDriver().click('byxpath', dataoper.readxml('space', 0, 'search'))
+        driver.click('byxpath', dataoper.readxml('space', 0, 'search'))
         time.sleep(1)
-        WebDriver().click('byid', dataoper.readxml('space', 0, 'add_user'))
+        driver.click('byid', dataoper.readxml('space', 0, 'add_user'))
         time.sleep(1)
         # 选择公开方式
-        WebDriver().click('byid', dataoper.readxml('space', 0, 'private'))
+        driver.click('byid', dataoper.readxml('space', 0, 'private'))
 
         # 保存
-        WebDriver().click('byid', dataoper.readxml('space', 0, 'save'))
+        driver.click('byid', dataoper.readxml('space', 0, 'save'))
         time.sleep(1)
-        current_url = WebDriver().currenturl()
+        current_url = driver.currenturl()
         # print "current_url:", current_url
 
         # 进入详细页面,并获取url
-        WebDriver().click('byid', dataoper.readxml('space', 0, 'droplist'))
+        driver.click('byid', dataoper.readxml('space', 0, 'droplist'))
         time.sleep(1)
-        WebDriver().click('bylink', dataoper.readxml('space', 0, 'detail'))
+        driver.click('bylink', dataoper.readxml('space', 0, 'detail'))
         time.sleep(1)
-        detail_url = WebDriver().currenturl()
+        detail_url = driver.currenturl()
 
         # 验证：1.确认space名称；2.确认公开方式
-        check = WebDriver().gettext('bycss', dataoper.readxml('space', 0, 'check'))
-        check2 = WebDriver().gettext('byxpath', dataoper.readxml('space', 0, 'check2'))
+        check = driver.gettext('bycss', dataoper.readxml('space', 0, 'check'))
+        check2 = driver.gettext('byxpath', dataoper.readxml('space', 0, 'check2'))
         value = dataoper.readxml('space', 0, 'value')
         value2 = dataoper.readxml('space', 0, 'value2')
         self.assertEqual(check, value), u"space名称不匹配，验证失败"
@@ -86,16 +87,13 @@ class CreatePrivateSpace(unittest.TestCase):
         # 使用space成员确认
         Operations().login(dataoper.readxml('confirm', 1, 'username'),
                               dataoper.readxml('confirm', 1, 'password'))
-        WebDriver().geturl(current_url)
+        driver.geturl(current_url)
         time.sleep(2)
 
         # 确认是否能正常访问
-        try:
-            WebDriver().is_element_present('byclass', dataoper.readxml('confirm', 1, 'element'))
-        except NoSuchElementException as msg:
-            print msg
-        else:
-            print "space成员确认可以访问"
+        if driver.is_element_present('byclass', dataoper.readxml('confirm', 1, 'element')) is False:
+            print "不能正常访问space"
+            assert False
 
     def test3_other_user_confirm(self):
         # 使用其他用户确认
@@ -103,15 +101,12 @@ class CreatePrivateSpace(unittest.TestCase):
                               dataoper.readxml('confirm', 0, 'password'))
         time.sleep(1)
         # print "open current_url by other user..."
-        WebDriver().geturl(current_url)
+        driver.geturl(current_url)
         time.sleep(2)
         # 确认是否显示错误页面
-        try:
-            WebDriver().is_element_present('byclass', dataoper.readxml('confirm', 0, 'element'))
-        except NoSuchElementException as msg:
-            print msg
-        else:
+        if driver.is_element_present('byclass', dataoper.readxml('confirm', 0, 'element')) is False:
             print "space以外的成员不能访问"
+            assert False
 
     def tearDown(self):
         # 退出
@@ -124,18 +119,16 @@ class CreatePrivateSpace(unittest.TestCase):
             Operations().login(dataoper.readxml('login', 0, 'username'),
                                dataoper.readxml('login', 0, 'password'))
             time.sleep(2)
-            WebDriver().geturl(detail_url)
+            driver.geturl(detail_url)
             time.sleep(2)
-            WebDriver().click('byid', dataoper.readxml('space', 0, 'delete_link'))
+            driver.click('byid', dataoper.readxml('space', 0, 'delete_link'))
             time.sleep(2)
-            WebDriver().click('byxpath', dataoper.readxml('space', 0, 'delete_yes'))
+            driver.click('byxpath', dataoper.readxml('space', 0, 'delete_yes'))
             time.sleep(2)
         except NoSuchElementException as msg:
-            print msg
-        else:
-            print "space数据已清除"
+            print msg, "Data has not been removed."
         finally:
-            WebDriver().close()  # 关闭浏览器
+            driver.close()  # 关闭浏览器
 
 
 if __name__ == "__main__":

@@ -1,8 +1,7 @@
 # coding=utf-8
 """
-Created on 2015年12月14日
-1.期間予定が登録されること
-2.参加者に予定の共有者が含まれていること
+Created on 2015年10月14日
+1.フォローが書き込めること
 @author: QLLU
 """
 # 导入需要的公共函数类
@@ -14,7 +13,7 @@ from CommonFunction.DataReader import DataReader
 from CommonFunction.Operations import Operations
 from CommonFunction.WebDriver import WebDriver
 
-class AddAllDayAppointment(unittest.TestCase):
+class AddFllow(unittest.TestCase):
 
     @classmethod
     def setUpClass(self):
@@ -23,20 +22,21 @@ class AddAllDayAppointment(unittest.TestCase):
         driver = WebDriver("open","firefox","local")
         driver.open(domain, "slash")
 
-    def test1_add_all_day_appointment(self):
+    def test1_add_follow(self):
         global dataoper, sche_detail_url
         dataoper = DataReader('USER_INFO.xml')
         Operations().login(dataoper.readxml('u1', 0, 'username'),
                               dataoper.readxml('u1', 0, 'password'))
-        # 添加整日预定
-        sche_name = "banner sche test"
+        # 添加预定
+        sche_name = "sche follow test"
         driver.open(domain, "g")
         driver.click("byxpath", "//span[@id='appmenu-schedule']/a/div")
-        # driver.findby("byxpath", "//span[@id='appmenu-schedule']/a/div").click()
-        driver.click("byxpath", "//div[@id='smart_main_menu_part']/span/a")
-        # 选择整日预定
-        driver.click("bycss", "span.tab_text_noimage > a")
+        driver.click("byxpath", ".//*[@id='smart_main_menu_part']/span[1]/a")
+        # 选择普通预定，输入标题，选择时间
         driver.input("byname", "title", sche_name)
+        driver.click("byid", "time_selector")
+        driver.click("byid", "time9")
+        driver.click("bylink", u"关闭")
         # 检索用户并添加
         time.sleep(1)
         driver.input("byname", "keyword_CGID", "u2")
@@ -47,24 +47,18 @@ class AddAllDayAppointment(unittest.TestCase):
         driver.click("byid", "schedule_submit_button")
         time.sleep(2)
         sche_detail_url = driver.currenturl()
-        sche_time = driver.gettext("bycss", "span.schedule_text_noticeable_grn")
-        print "output:", sche_time
-        self.assertTrue( u"00:00～23:59" in sche_time)
-        # self.assertIn(u"00:00～23:59", sche_time)
-        user = driver.gettext("bylink", "u2")
-        self.assertEqual(user, "u2")
-
-    def tearDown(self):
-        Operations().logout()
+        # 输入comment
+        driver.input("byid", "textarea_id", "comment1")
+        driver.click("byclass", "button_min_width2_grn")
+        time.sleep(2)
+        # 验证
+        comment = driver.gettext("byxpath", "//pre[text()='comment1']")
+        self.assertEqual(comment, "comment1")
 
     @classmethod
     def tearDownClass(self):
+        # 清除数据
         try:
-            # 清空预定
-            Operations().login(dataoper.readxml('u1', 0, 'username'),
-                              dataoper.readxml('u1', 0, 'password'))
-            driver.geturl(sche_detail_url)
-            time.sleep(2)
             driver.click("byxpath", "//span[2]/span/a")
             # 删除全部参加者
             driver.click("byid", "1")

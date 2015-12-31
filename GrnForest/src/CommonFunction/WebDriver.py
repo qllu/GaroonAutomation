@@ -12,6 +12,7 @@ from selenium import webdriver
 from selenium.webdriver.support.ui import Select
 from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.common.action_chains import ActionChains
+
 # from selenium.webdriver.common.action_chains import ActionChains
 # from selenium.webdriver.common.keys import Keys
 global G_WEBDRIVER, G_BROWSERTYTPE,driver
@@ -28,6 +29,7 @@ class WebDriver(object):
         @param aType:打开浏览器的类型，如chrome,firefox,ie等要测试的浏览器类型
         @param cType:打开本地或是远程浏览器： local,本地；notlocal：远程
         """
+
         global driver
         if(  btype == "open" ):
             if(atype == "chrome"):
@@ -53,7 +55,7 @@ class WebDriver(object):
             elif(  atype == "firefox" ):
                 if(ctype == "local"):
                     driver = webdriver.Firefox()
-                    driver.maximize_window()
+                    # driver.maximize_window()
 
                 elif(ctype == "notlocal"):
                     print "打开远程的Firefox"
@@ -151,7 +153,9 @@ class WebDriver(object):
                 self.driver.find_element_by_class_name(elmethod)
             elif(findby == 'bycss'):
                 self.driver.find_element_by_css_selector(elmethod)
-        except NoSuchElementException: return False
+        except NoSuchElementException as msg:
+            # print msg
+            return False
         return True
 
     def screenshot(self, file_path):

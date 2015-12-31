@@ -1,20 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <TestData>
-	<admin>
+	<login>
 		<username>Administrator</username>
-		<password>qatest01</password>
-	</admin>
-	<u1>
+		<password>qatest01</password>	
+	</login>
+	
+	<sche name="登录测试数据">
 		<username>u1</username>
 		<password>cybozu1</password>
-	</u1>
-	<u2>
+	</sche>
+
+	<confirm name="登录测试数据">
 		<username>u2</username>
 		<password>cybozu1</password>
-	</u2>
-	<u3>
-		<username>u3</username>
-		<password>cybozu1</password>
-	</u3>
+	</confirm>
 
 </TestData>	
