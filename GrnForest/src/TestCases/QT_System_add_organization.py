@@ -20,9 +20,10 @@ class AddOrganization(unittest.TestCase):
     新增组织
     '''
     def setUp(self):
-        global domain
+        global domain, driver
         domain = "qatest01"
-        WebDriver("open","firefox","local").open(domain, "slash")#打开浏览器，并打开forest
+        driver = WebDriver("open","firefox","local")
+        driver.open(domain, "slash")#打开浏览器，并打开forest
 
     def test_add_organization(self):
         
@@ -31,48 +32,48 @@ class AddOrganization(unittest.TestCase):
 
         #登录用户
         Operations().login(dataoper.readxml('login', 0, 'username'),dataoper.readxml('login', 0, 'password'))
-        time.sleep(2)
+        driver.wait(3)
 
         #点击进入共通管理
-        admin_url = WebDriver().testurl("qatest01") + "/admin/"
-        WebDriver().geturl(admin_url)
-        time.sleep(2)
+        admin_url = driver.testurl("qatest01") + "/admin/"
+        driver.geturl(admin_url)
+        driver.wait(3)
 
         #点击进入组织
-        WebDriver().click('byxpath', dataoper.readxml('org', 0, 'org_link'))
-        time.sleep(2) 
+        driver.click('byxpath', dataoper.readxml('org', 0, 'org_link'))
+        driver.wait(3)
 
         #点击添加组织按钮
-        WebDriver().click('byid', dataoper.readxml('org', 0, 'add_botton'))
+        driver.click('byid', dataoper.readxml('org', 0, 'add_botton'))
 
         #输入组织名
-        WebDriver().input('byid', dataoper.readxml('org', 0, 'org_name'), dataoper.readxml('org', 0, 'name'))
-        time.sleep(1) 
+        driver.input('byid', dataoper.readxml('org', 0, 'org_name'), dataoper.readxml('org', 0, 'name'))
+        driver.wait(2)
 
         # #输入组织代码
-        # WebDriver().input('byid', dataoper.readxml('org', 0, 'org_code'), dataoper.readxml('org', 0, 'code'))
-        # time.sleep(1)
+        # driver.input('byid', dataoper.readxml('org', 0, 'org_code'), dataoper.readxml('org', 0, 'code'))
+        # driver.wait(2)
 
         #输入组织说明
-        WebDriver().input('byid', dataoper.readxml('org', 0, 'org_comment'), dataoper.readxml('org', 0, 'comment'))
-        time.sleep(1) 
+        driver.input('byid', dataoper.readxml('org', 0, 'org_comment'), dataoper.readxml('org', 0, 'comment'))
+        driver.wait(2)
 
         #保存
-        WebDriver().click('byid', dataoper.readxml('org', 0, 'save'))
-        time.sleep(2)
+        driver.click('byid', dataoper.readxml('org', 0, 'save'))
+        driver.wait(3)
 
         #验证(云版未验证)
-        # checkpoint1 = WebDriver().gettext('bycss',dataoper.readxml('login', 0,'checkpoint'))
+        # checkpoint1 = driver.gettext('bycss',dataoper.readxml('login', 0,'checkpoint'))
         # value1 = dataoper.readxml('login', 0, 'value')
         # self.assertEqual(checkpoint1,value1)
 
         #退出
         Operations().logout()
-        time.sleep(3) 
+        driver.wait(5)
 
         
     def tearDown(self):
-        WebDriver().close()#关闭浏览器
+        driver.close()#关闭浏览器
        
 if __name__ == "__main__":   
     unittest.main()
